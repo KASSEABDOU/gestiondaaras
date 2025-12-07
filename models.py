@@ -2,6 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import enum
 from datetime import datetime, timezone
+import cloudinary
+import cloudinary.utils
 
 # Créer l'instance SQLAlchemy SANS l'initialiser immédiatement
 db = SQLAlchemy()
@@ -49,55 +51,79 @@ class Utilisateur(db.Model):
     nom = db.Column(db.String(100), nullable=False)
     prenom = db.Column(db.String(100), nullable=False)
     adresse = db.Column(db.Text)
-    date_naissance = db.Column(db.Date, nullable=False, default=datetime.utcnow)
-    lieu_naissance = db.Column(db.String(100), nullable=False)
-    # SUPPRIMER les colonnes age et nb_annees - on les calcule dynamiquement
+
+    # IMPORTANT : ne pas mettre utcnow() sinon la date est fixée une seule fois
+    date_naissance = db.Column(db.Date, nullable=False)
     date_entree = db.Column(db.Date, default=datetime.utcnow)
+
+    lieu_naissance = db.Column(db.String(100), nullable=False)
+
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
+
     role = db.Column(db.Enum(RoleEnum), nullable=False)
+
     photo_profil = db.Column(db.String(255))
+
     type = db.Column(db.String(20))
     sexe = db.Column(db.String(20))
-    nationalite = db.Column(db.String(20))
-    
+    nationalite = db.Column(db.String(50))
+
     __mapper_args__ = {
         'polymorphic_identity': 'utilisateur',
         'polymorphic_on': type
     }
-    
+
     def __init__(self, **kwargs):
-        if 'type' not in kwargs:
-            kwargs['type'] = 'utilisateur'
+        kwargs.setdefault("type", "utilisateur")
         super().__init__(**kwargs)
-    
+
+    # -------------------------------
+    # Sécurité : gestion des passwords
+    # -------------------------------
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
+
+    # -------------------------------
+    # Propriétés dynamiques
+    # -------------------------------
     @property
     def age(self):
-        """Calcule l'âge dynamiquement à chaque appel"""
-        if self.date_naissance:
-            today = datetime.now().date()
-            return today.year - self.date_naissance.year - (
-                (today.month, today.day) < (self.date_naissance.month, self.date_naissance.day)
-            )
-        return None
-    
+        if not self.date_naissance:
+            return None
+        today = datetime.now().date()
+        return today.year - self.date_naissance.year - (
+            (today.month, today.day) < (self.date_naissance.month, self.date_naissance.day)
+        )
+
     @property
     def nb_annees(self):
-        """Calcule le nombre d'années dynamiquement à chaque appel"""
-        if self.date_entree:
-            today = datetime.now().date()
-            return today.year - self.date_entree.year - (
-                (today.month, today.day) < (self.date_entree.month, self.date_entree.day)
-            )
-        return None
-    
+        if not self.date_entree:
+            return None
+        today = datetime.now().date()
+        return today.year - self.date_entree.year - (
+            (today.month, today.day) < (self.date_entree.month, self.date_entree.day)
+        )
+
+    # -------------------------------
+    # Sérialisation JSON
+    # -------------------------------
     def to_dict(self):
+        # URL Cloudinary si photo_profil existe
+        photo_url = None
+        if self.photo_profil:
+            # Utilise le nom public_id de Cloudinary
+            # Exemple: self.photo_profil = "profiles/1689612345_nom.jpg"
+            # cloudinary.utils.cloudinary_url construit l’URL sécurisée
+
+            photo_url, options = cloudinary.utils.cloudinary_url(
+                self.photo_profil,
+                secure=True
+            )
+
         return {
             'id': self.id,
             'matricule': self.matricule,
@@ -106,17 +132,18 @@ class Utilisateur(db.Model):
             'adresse': self.adresse,
             'date_naissance': self.date_naissance.isoformat() if self.date_naissance else None,
             'lieu_naissance': self.lieu_naissance,
-            'age': self.age,  # Appel dynamique de la property
+            'age': self.age,
             'date_entree': self.date_entree.isoformat() if self.date_entree else None,
-            'nb_annees': self.nb_annees,  # Appel dynamique de la property
+            'nb_annees': self.nb_annees,
             'email': self.email,
             'sexe': self.sexe,
             'nationalite': self.nationalite,
             'role': self.role.value,
-            'photo_profil': self.photo_profil,
+            'photo_profil': self.photo_profil,  # public_id Cloudinary
             'type': self.type,
-            'photo_profil_url': f'https://gestiondaaras-2.onrender.com/api/uploads/{self.photo_profil}' if self.photo_profil else None
+            'photo_profil_url': photo_url  # URL directe Cloudinary
         }
+
         
 class Talibe(Utilisateur):
     __tablename__ = 'talibes'

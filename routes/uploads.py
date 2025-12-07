@@ -83,7 +83,7 @@ def upload_photo():
         print(f"✅ Fichier sauvegardé: {file_size} bytes - {unique_filename}")
         
         # URL pour accéder au fichier
-        photo_url = f"https://gestiondaaras-2.onrender.com/api/uploads/{unique_filename}"
+        photo_url = f"http://127.0.0.1:5000/api/uploads/{unique_filename}" #https://gestiondaaras-2.onrender.com
         
         return jsonify({
             'url': photo_url,

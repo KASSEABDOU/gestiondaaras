@@ -1,10 +1,11 @@
 import os
 from datetime import timedelta
 from urllib.parse import quote_plus
+import cloudinary
 
 class Config:
     # Secret key
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'une-cle-super-secrete-pour-les-daaras')
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
     # Database (Render PostgreSQL)
     DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -23,7 +24,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-daara')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
 
 
@@ -33,3 +34,11 @@ class TestConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = 'test-secret-key'
     SECRET_KEY = 'test-secret-key'
+    
+    
+cloudinary.config(
+    cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret = os.environ.get("CLOUDINARY_API_SECRET"),
+    secure = True
+)
