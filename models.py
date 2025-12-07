@@ -115,7 +115,7 @@ class Utilisateur(db.Model):
             'role': self.role.value,
             'photo_profil': self.photo_profil,
             'type': self.type,
-            'photo_profil_url': f'http://localhost:5000/api/uploads/{self.photo_profil}' if self.photo_profil else None
+            'photo_profil_url': f'https://gestiondaaras-2.onrender.com/api/uploads/{self.photo_profil}' if self.photo_profil else None
         }
         
 class Talibe(Utilisateur):
