@@ -248,6 +248,20 @@ def create_default_users():
 app = create_app()  # ← Ajouter ceci ici
 
         
+with app.app_context():
+    try:
+        print("🔧 Checking database tables...")
+        
+        # Créer toutes les tables si elles n'existent pas
+        db.create_all()
+        print("✅ Database tables created/verified")
+        
+        # Créer les utilisateurs par défaut
+        create_default_users()
+        print("✅ Default users created")
+        
+    except Exception as e:
+        print(f"⚠️ Warning during database initialization: {e}")
 
 
 if __name__ == '__main__':
