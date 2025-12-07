@@ -13,7 +13,30 @@ jwt = JWTManager()
 
 def create_app(testing=False):
     app = Flask(__name__)
-    CORS(app, origins="http://localhost:4200")  # autorise ton frontend
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": [
+                "http://localhost:4200",  # Dev
+                "https://frontend-seven-nu-b1bl62wjh8.vercel.app",  # Votre frontend
+                "https://*.vercel.app",  # Tous Vercel
+                "https://vercel.app",  # Domaine principal
+                "*"  # En dernier recours, toutes les origines
+            ],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+            "allow_headers": [
+                "Content-Type",
+                "Authorization", 
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "X-CSRF-Token",
+                "Access-Control-Allow-Origin"
+            ],
+            "expose_headers": ["Content-Type", "Authorization", "Content-Length"],
+            "supports_credentials": True,
+            "max_age": 3600
+        }
+    })  # autorise ton frontend
 
     if testing:
         app.config['TESTING'] = True
@@ -111,6 +134,7 @@ def create_app(testing=False):
             "service": "Flask API",
             "timestamp": "2024-01-01T00:00:00Z",  # Vous pouvez utiliser datetime
             "environment": os.environ.get('FLASK_ENV', 'development')
+             
         })
 
     @app.route('/api/docs', methods=['GET'])
