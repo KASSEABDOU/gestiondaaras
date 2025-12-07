@@ -219,6 +219,11 @@ def create_default_users():
         import traceback
         traceback.print_exc()
         
+# ... tout ton code au-dessus ...
+
+app = create_app()  # ← Ajouter ceci ici
+
+        
 
 
 if __name__ == '__main__':
