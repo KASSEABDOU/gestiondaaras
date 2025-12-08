@@ -3,6 +3,7 @@ import cloudinary.uploader
 from flask import request, jsonify, Blueprint
 from flask_jwt_extended import jwt_required
 from models import Talibe, db
+import traceback
 
 # Configurer Cloudinary (à mettre dans config ou variables d'environnement)
 cloudinary.config(
@@ -55,7 +56,10 @@ def upload_photo():
         }), 200
 
     except Exception as e:
+        traceback.print_exc()  # affichera le détail dans les logs Render
+        db.session.rollback()
         return jsonify({'error': str(e)}), 500
+        
 
 
 # --- Upload pour un Talibe spécifique ---
