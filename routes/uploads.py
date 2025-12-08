@@ -4,13 +4,14 @@ from flask import request, jsonify, Blueprint
 from flask_jwt_extended import jwt_required
 from models import Talibe, db
 import traceback
+import os
 
 # Configurer Cloudinary (à mettre dans config ou variables d'environnement)
 cloudinary.config(
-    cloud_name="TON_CLOUD_NAME",
-    api_key="TON_API_KEY",
-    api_secret="TON_API_SECRET",
-    secure=True
+    cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret = os.environ.get("CLOUDINARY_API_SECRET"),
+    secure = True
 )
 
 # Blueprint
