@@ -34,6 +34,9 @@ def get_talibe(id):
         return jsonify(talibe.to_dict()), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+def to_int_or_none(value):
+    return int(value) if str(value).isdigit() else None
 
 @talibe_bp.route('talibes/create', methods=['POST'])
 @jwt_required()
@@ -72,10 +75,11 @@ def create_talibe():
         talibe.mere = data.get('mere', '')
         talibe.niveau = data.get('niveau', 'Débutant')
         talibe.extrait_naissance = data.get('extrait_naissance', False)
-        talibe.daara_id = data.get('daara_id')
-        talibe.chambre_id = data.get('chambre_id')
         talibe.nationalite = data.get('nationalite')
         talibe.sexe = data.get('sexe')
+        talibe.daara_id = to_int_or_none(data.get("daara_id"))
+        talibe.chambre_id = to_int_or_none(data.get("chambre_id"))
+
         
         # CORRECTION : Ajouter photo_profil
         talibe.photo_profil = data.get('photo_profil')  # ← AJOUT IMPORTANT
