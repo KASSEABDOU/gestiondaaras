@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 from models import db, Talibe, Cours, RoleEnum, Inscription
 from decorators import role_required
+import traceback
 
 # Import conditionnel pour Inscription
 try:
@@ -103,6 +104,7 @@ def create_talibe():
         }), 201
         
     except Exception as e:
+        traceback.print_exc()
         db.session.rollback()
         print(f"Erreur création talibé: {str(e)}")
         return jsonify({'error': f'Erreur lors de la création: {str(e)}'}), 500
