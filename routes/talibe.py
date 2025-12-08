@@ -78,7 +78,7 @@ def create_talibe():
         talibe.nationalite = data.get('nationalite')
         talibe.sexe = data.get('sexe')
         talibe.daara_id = to_int_or_none(data.get("daara_id"))
-        talibe.chambre_id = to_int_or_none(data.get("chambre_id"))
+        
 
         
         # CORRECTION : Ajouter photo_profil
