@@ -5,7 +5,7 @@ import cloudinary
 
 class Config:
     # Secret key
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY','mstdou331008gestiondaaras')
 
     # Database (Render PostgreSQL)
     DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -24,7 +24,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY','mstdou331008gestiondaaras123456666')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
 
 

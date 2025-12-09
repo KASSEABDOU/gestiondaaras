@@ -112,13 +112,8 @@ class Utilisateur(db.Model):
     # Sérialisation JSON
     # -------------------------------
     def to_dict(self):
-        # URL Cloudinary si photo_profil existe
         photo_url = None
         if self.photo_profil:
-            # Utilise le nom public_id de Cloudinary
-            # Exemple: self.photo_profil = "profiles/1689612345_nom.jpg"
-            # cloudinary.utils.cloudinary_url construit l’URL sécurisée
-
             photo_url, options = cloudinary.utils.cloudinary_url(
                 self.photo_profil,
                 secure=True
@@ -139,10 +134,10 @@ class Utilisateur(db.Model):
             'sexe': self.sexe,
             'nationalite': self.nationalite,
             'role': self.role.value,
-            'photo_profil': self.photo_profil,  # public_id Cloudinary
-            'type': self.type,
-            'photo_profil_url': photo_url  # URL directe Cloudinary
+            'photo_profil': photo_url,  # maintenant c’est directement l’URL
+            'type': self.type
         }
+
 
         
 class Talibe(Utilisateur):
